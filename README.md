@@ -4,7 +4,7 @@
 
 ### site.html
 
-source of https://jasonmunro/, my personal website
+source of https://jasonmunro.net/, my personal website
 
 ### main.py
 Retro game written in pyxel that provides info from my resume
