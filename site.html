@@ -90,6 +90,17 @@
                 font-size: 16pt;
             }
 
+            /* these are used to toggle the font size on the TV
+               screen between pages so the content is as big as
+               possible without overflowing
+            */
+            .screen_home {
+                font-size: 14pt;
+            }
+            .screen_html {
+                font-size: 12pt;
+            }
+            
             /* This holds the pyxel game. I don't like iframes
                anymore than you do but this works a treat for
                easy pyxel integration
@@ -102,17 +113,6 @@
                 height: 663px !important;
             }
 
-            /* these are used to toggle the font size on the TV
-               screen between pages so the content is as big as
-               possible without overflowing
-            */
-            .screen_home {
-                font-size: 19pt;
-            }
-            .screen_html {
-                font-size: 12pt;
-            }
-            
             /* found this online [citation needed]. It's a cool CSS way to do
                a static intro on the TV screen
             */
@@ -164,8 +164,8 @@
                 position: absolute;
                 flex: 1;
                 bottom: 75px;
-                left: calc(50% - 130px);
-                translateX(calc(50% - 130px));
+                left: calc(50% - 30px);
+                translateX(calc(50% - 30px));
                 font-family: monospace;
                 background-color: transparent;
                 transform: rotate(-.7deg);
@@ -269,12 +269,12 @@
                 <a onclick="switch_page(this);" title="Home">home</a>
                 <a onclick="switch_page(this);" title="Resume as HTML">html</a>
                 <a onclick="switch_page(this);" title="Resume as a game">game</a>
-                <b>|</b>
                 <a onclick="window.open('./Jason_Munro.pdf', '_blank');" title="Resume as PDF">pdf</a>
                 <a onclick="window.open('https://github.com/jasonmunro/retro_resume/', '_blank');" title="Website and game code source">src</a>
-                <a onclick="window.open('https://cypht.org/', '_blank');" title="OS project">os</a>
+                <!-- <a onclick="window.open('https://cypht.org/', '_blank');" title="OS project">os</a>
                 <a onclick="window.open('https://unencumberedbyfacts.com', '_blank');" title="Blog">blog</a>
                 <a onclick="window.open('https://github.com/cypht-org/', '_blank');" title="Github">git</a>
+                -->
             </div>
 
             <!-- TV screen and logo -->
@@ -393,19 +393,21 @@
                 'PAUSE:200',
                 '\nYou can use the links below this screen to visit:\n\n',
                 'PAUSE:100', '',
-                'home    ● this page\n',
-                'html    ● my resume as HTML\n',
-                'game    ● my resume as a playable retro game\n',
+                'home         ● this page\n',
+                'html         ● my resume as HTML\n',
+                'game         ● my resume as a playable retro game\n',
                 'PAUSE:400',
-                'pdf     ↗ my resume as a PDF\n',
-                'src     ↗ website and retro game source on github\n',
+                'pdf          ↗ my resume as a PDF\n',
+                'src          ↗ website and retro game source on github\n',
+                'PAUSE:100',
+                '\nSome other stuff to check out:\n',
                 'PAUSE:500', '', '',
-                'os      ↗ cypht home page\n',
-                'blog    ↗ unencumbered by facts\n',
+                '\nos project   ↗ cypht.org\n',
+                'blog         ↗ unencumberedbyfacts.com\n',
                 'PAUSE:800',
-                'git     ↗ cypht.org on github\n',
+                'git          ↗ github.com/cypht-org/\n',
                 'PAUSE:1100',
-                '\nE-mail  ✉ jason at cypht dot org\n\n', '',
+                '\nE-mail       ✉ jason at cypht dot org\n\n', '',
                 'PAUSE:900',
                 'END OF LINE.\n', ''
             ]);
