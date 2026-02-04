@@ -16,4 +16,4 @@ using [pyxel](https://github.com/kitao/pyxel?tab=readme-ov-file)
 I can make no claims as to the fitness or correctness of the code,
 but it was fun to create and works as intended!
 
-You can play the game at [jasonmunro.net](https://jasonmunro.net/game/)
+You can play the game at [jasonmunro.net](https://jasonmunro.net)
