@@ -107,7 +107,7 @@
                possible without overflowing
             */
             .screen_home {
-                font-size: 16pt;
+                font-size: 19pt;
             }
             .screen_html {
                 font-size: 12pt;
@@ -145,7 +145,7 @@
             /* the "logo" on the bottom left of the TV frame */
             .logo {
                 /*color: #0f100d;*/
-                color: #aaa;
+                color: #777;
                 text-shadow: 0px 0px 10px rgba(128, 128, 128, 0.4);
                 flex: 1;
                 position: absolute;
@@ -164,11 +164,11 @@
                 position: absolute;
                 flex: 1;
                 bottom: 75px;
-                left: 50%;
-                translateX(50%);
+                left: calc(50% - 130px);
+                translateX(calc(50% - 130px));
                 font-family: monospace;
                 background-color: transparent;
-                transform: rotate(-1.1deg);
+                transform: rotate(-.7deg);
                 z-index: 2;
             }
 
@@ -177,9 +177,17 @@
                 cursor: pointer;
                 font-size: 14pt;
                 color: #52524f;
-                margin-right: 20px;
+                margin-right: 10px;
                 text-decoration: none;
                 text-shadow: 0px 2px 3px rgba(90,90,90,0.4);
+            }
+            b {
+                color: #52524f;
+                opacity: .7;
+                font-size: 22px;
+                font-weight: bold;
+                margin-right: 5px;
+                vertical-align: -2px;
             }
 
             /* highlight links on mouse over */
@@ -260,13 +268,17 @@
             <div class="menu">
                 <a onclick="switch_page(this);" title="Home">home</a>
                 <a onclick="switch_page(this);" title="Resume as HTML">html</a>
-                <a onclick="switch_page(this);" title="Resume as PDF">pdf</a>
                 <a onclick="switch_page(this);" title="Resume as a game">game</a>
-                <a onclick="switch_page(this);" title="Page source">src</a>
+                <b>|</b>
+                <a onclick="window.open('./Jason_Munro.pdf', '_blank');" title="Resume as PDF">pdf</a>
+                <a onclick="window.open('https://github.com/jasonmunro/retro_resume/blob/main/site.html', '_blank');" title="Page source">src</a>
+                <a onclick="window.open('https://cypht.org/', '_blank');" title="OS project">os</a>
+                <a onclick="window.open('https://unencumberedbyfacts.com', '_blank');" title="Blog">blog</a>
+                <a onclick="window.open('https://github.com/cypht-org/', '_blank');" title="Github">git</a>
             </div>
 
             <!-- TV screen and logo -->
-            <div class="screen" id="screen">
+            <div class="screen screen_home" id="screen">
                 <pre id="oldlines"></pre>
                 <pre id="newlines"></pre>
             </div>
@@ -367,7 +379,7 @@
                 return secs - jit;
             }
         }
-
+00
         /* render the home page content */
         function run_home() {
             document.getElementById("screen").classList.remove('screen_loading');
@@ -379,24 +391,21 @@
                 'PAUSE:500',
                 'Welcome to jasonmunro.net\n',
                 'PAUSE:200',
-                'You can use the links below to visit:\n\n',
+                '\nYou can use the links below this screen to visit:\n\n',
                 'PAUSE:100', '',
-                'home    - this page\n',
-                'html    - my resume as HTML\n',
-                'pdf     - my resume as a PDF\n',
+                'home    ● this page\n',
+                'html    ● my resume as HTML\n',
+                'game    ● my resume as a playable retro game\n',
                 'PAUSE:400',
-                'game    - my resume as a playable retro game\n\n',
-                'PAUSE:200',
-                'Maybe you want one of these other things:\n\n',
+                'pdf     ↗ my resume as a PDF\n',
+                'src     ↗ the source for this website on github\n',
                 'PAUSE:500', '', '',
-                'Open Source project    - cypht.org\n',
-                'PAUSE:1000',
-                'Blog                   - unencumberedbyfacts.com\n',
-                'PAUSE:1200',
-                'Github accounts        - github.com/jasonmunro/\n',
-                '                       - github.com/cypht-org/\n',
+                'os      ↗ cypht home page\n',
+                'blog    ↗ unencumbered by facts\n',
+                'PAUSE:800',
+                'git     ↗ cypht.org on github\n',
                 'PAUSE:1100',
-                'E-mail                 - jason at cypht dot org\n\n', '',
+                '\nE-mail  ✉ jason at cypht dot org\n\n', '',
                 'PAUSE:900',
                 'END OF LINE.\n', ''
             ]);
@@ -576,12 +585,26 @@
             if (page == 'src') {
                 document.location = 'https://github.com/jasonmunro/retro_resume/blob/main/site.html';
             }
+
+            /* cypht home page */
+            if (page == 'os') {
+                document.location = 'https://cypht.org';
+            }
+            /* blog */
+            if (page == 'blog') {
+                document.location = 'https://unencumberedbyfacts.com';
+            }
+            /* cypht github */
+            if (page == 'git') {
+                document.location = 'https://github.com/cypht-org/';
+            }
+            /* email mailto? */
             return false;
         }
 
         /* load the home page on first load. trigger the loading static on the TV
            screen */
-        window.addEventListener("load", function(event) {
+        window.addEventListener("DOMContentLoaded", function(event) {
             document.getElementById('screen').classList.add('screen_loading');
             document.getElementById('screen').classList.add('screen_home_mobile');
             setTimeout(run_home, 1500);
