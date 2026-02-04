@@ -1,0 +1,600 @@
+<!DOCTYPE html><html>
+
+<!--
+
+    Welcome to my super cool website!
+
+    I built this by hand with as few dependencies as possible. Everything
+    except the images and the pyxel game code is inline with comments. It's a
+    very simple system with a full screen flexbox layout. It's all vanilla JS
+    outside of the game specific bits.
+
+    The CRT TV is anchored on center bottom of the viewport. It scales well
+    both in viewport size and zoom level, but the full site is restricted to
+    1350x900 minimum. The smaller view hides the graphics and focuses on the TV
+    screen content, usable but still in progress.
+
+    The graphics are made from images I found online that I beleive are free
+    use for a personal site. If you are one of these specific image owners, and
+    I'm wrong about that, please contact me.
+
+    The JS looks old becuase it is, I think the core parts are going on 10
+    years. I know how to make this flavor of JS work so for now that's enough.
+
+    Inquiries can be sent to jason@cypht.org.
+
+-->
+
+    <head>
+
+        <!-- normal header stuff -->
+        <title>jasonmunro.net</title>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+        <link rel="icon" type="image/x-icon" href="./favicon.ico">
+
+        <!-- stylin' -->
+        <style>
+
+            /* the body tag is completely obscured but momentarily visible
+               on hard refresh so make it black and make sure pesky user
+               level css does not add margins
+            */
+            body {
+                background-color: #000;
+                margin: 0px;
+            }
+
+            /* The flexbox container that spans the entire screen and has the
+               wood paneling background.
+            */
+            .outer {
+                background-image: url('./bg2.webp');
+                flex-direction: column;
+                display: flex;
+                height: 100vh;
+                width: 100vw;
+                z-index: -1;
+            }
+
+            /* used to render preformatted text on the TV screen */
+            pre {
+                background-color: transparent;
+                color: green;
+                font-family: monospace;
+                padding: 0px;
+                margin: 0px;
+                font-size: inherit;
+            }
+
+            /* the TV screen. The webp has built in static "scanlines"
+               and the font properties make it look more CRT-y.
+            */
+            .screen {
+                position: absolute;
+                background-image: url('./screen5.webp');
+                background-repeat: no-repeat;
+                z-index: 0;
+                width: 817px;
+                padding-left: 35px;
+                height: 628px;
+                padding-top: 35px;
+                bottom: 150px;
+                left: calc(50% - 70px);
+                transform: translateX(calc(-50% - 70px));
+                flex: 1;
+                color: green;
+                text-shadow: 0 0 2px #00ff00;
+                background-color: #111;
+                font-family: monospace;
+                overflow-y: scroll;
+                font-size: 16pt;
+            }
+
+            /* This holds the pyxel game. I don't like iframes
+               anymore than you do but this works a treat for
+               easy pyxel integration
+            */
+            iframe {
+                border: none;
+                width: 852px !important;
+                padding-left: 0px !important;
+                padding-bottom: 0px !important;
+                height: 663px !important;
+            }
+
+            /* these are used to toggle the font size on the TV
+               screen between pages so the content is as big as
+               possible without overflowing
+            */
+            .screen_home {
+                font-size: 16pt;
+            }
+            .screen_html {
+                font-size: 12pt;
+            }
+            
+            /* found this online (citation). It's a cool CSS way to do
+               a static intro on the TV screen
+            */
+            .screen_loading {
+                background:
+                    repeating-radial-gradient(#000 0 0.0001%,#555 0 0.0002%) 50% 0/2500px 2500px,
+                    repeating-conic-gradient(#000 0 0.0001%,#555 0 0.0002%) 60% 60%/2500px 2500px;
+                background-blend-mode: difference;
+                animation: static .2s infinite alternate;
+            }
+            @keyframes static {
+                100% {background-position: 50% 0, 60% 50%}
+            }
+
+            /* div with the TV frame image */
+            .crt {
+                position: relative;
+                z-index: 1;
+                background-image: url('./tv5.webp');
+                background-repeat: no-repeat;
+                flex: 1;
+                background-position: bottom center;
+            }
+
+            /* flashing cursor used on the TV screen */
+            #cursor {
+                text-shadow: none;
+            }
+
+            /* the "logo" on the bottom left of the TV frame */
+            .logo {
+                /*color: #0f100d;*/
+                color: #aaa;
+                text-shadow: 0px 0px 10px rgba(128, 128, 128, 0.4);
+                flex: 1;
+                position: absolute;
+                font-family: monospace;
+                bottom: 75px;
+                transform: rotate(1.0deg);
+                left: calc(50% - 530px);
+                translateX(calc(50% - 530px));
+                font-size: 16pt;
+                background-color: transparent;
+                z-index: 2;
+            }
+
+            /* link container on the bottom right of the TV frame */
+            .menu {
+                position: absolute;
+                flex: 1;
+                bottom: 75px;
+                left: 50%;
+                translateX(50%);
+                font-family: monospace;
+                background-color: transparent;
+                transform: rotate(-1.1deg);
+                z-index: 2;
+            }
+
+            /* links on the bottom right of the TV frame */
+            .menu a {
+                cursor: pointer;
+                font-size: 14pt;
+                color: #52524f;
+                margin-right: 20px;
+                text-decoration: none;
+                text-shadow: 0px 2px 3px rgba(90,90,90,0.4);
+            }
+
+            /* highlight links on mouse over */
+            .menu a:hover {
+                color: #999;
+                text-shadow: 0px 2px 3px rgba(160,160,160,0.5);
+            }
+
+            /* anything smaller than 1350x900 is treated as mobile (for now).
+               For these cases we hide all the fancy images and just show the
+               content as big as we can
+            */
+            @media (max-width: 1350px) or (max-height: 900px) {
+
+                /* hide images */
+                html, body .outer {
+                    background: none;
+                    background-color: #000
+                }
+                pre {
+                    font-size: inherit;
+                }
+
+                /* don't show this div at all */
+                .crt {
+                    display: none;
+                }
+
+                /* adjust the TV screen to be just the main content area */
+                .screen {
+                    position: relative;
+                    width: calc(100vw - 35px);
+                    height: calc(100vh - 35px);
+                    background-color: #000;
+                    background: none;
+                    bottom: auto;
+                    left: auto;
+                    transform: none;
+                    margin-left: 0px;
+                    margin-top: 60px;
+                }
+
+                /* used to toggle font sizes based on the view */
+                .screen_home_mobile {
+                    font-size: 24pt;
+                }
+                .screen_html_mobile {
+                    font-size: 18.5px;
+                }
+
+                /* no logo in this mode */
+                .logo {
+                    display: none;
+                }
+
+                /* move the menu to the top of the page and reformat */
+                .menu {
+                    width: 500px;
+                    transform: rotate(0deg);
+                    bottom: auto;
+                    top: 10px;
+                    left: 20px;
+                }
+                .menu a {
+                    font-size: 30pt;
+                }
+                .menu a:hover {
+                    color: #888;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- content containers -->
+        <div class="outer" id="outer">
+
+            <!-- menu and links -->
+            <div class="menu">
+                <!-- sometimes a couple inline onclick events make sense. This
+                    is one of those
+                -->
+                <a onclick="switch_page(this);" title="Home">home</a>
+                <a onclick="switch_page(this);" title="Resume as HTML">html</a>
+                <a onclick="switch_page(this);" title="Resume as PDF">pdf</a>
+                <a onclick="switch_page(this);" title="Resume as a game">game</a>
+                <a onclick="switch_page(this);" title="Page source">src</a>
+            </div>
+
+            <!-- TV screen and logo -->
+            <div class="screen" id="screen">
+                <pre id="oldlines"></pre>
+                <pre id="newlines"></pre>
+            </div>
+            <div class="logo">jasonmunro.net</div>
+
+            <!-- TV frame. Note the "inert" attribute. This allows passthrough
+                JS events so this div can mask the "screen"
+            -->
+            <div inert class="crt">
+            </div>
+        </div>
+
+        <!-- The code. Not terribly ugly but not what I would call elegant :) -->
+        <script type="text/javascript">
+
+        /* globals to make things simpler. These are knobs that control how the text
+           is printed on the TV screen. Jitter adds some minor random timing, delay
+           and increment control how fast the print operation works, and color is for
+           the flashing cursor
+         */
+
+        var use_jitter = true;
+        var delay = 700;
+        var increment = 70;
+        var color = 'green';
+
+        /* 2 text containers, 1 to render per-character printing the other to push
+           finished lines into
+           TODO: rename "dv" that is a terrible variable name
+        */
+        var dv = document.getElementById("newlines");
+        var oldlines = document.getElementById("oldlines");
+
+        /* create the flashing cursor */
+        var cursor = '<span style="vertical-align: 0px;" id="cursor">&#9608;</span>';
+
+        /* this is called at the end of a printed line and it pushes the finished
+           content into the oldlines div then preps the cursor for the next line
+        */
+        function reset_div() {
+            oldlines.innerHTML += dv.innerHTML.split('<')[0];
+            dv.innerHTML = cursor;
+            dv.scrollIntoView({'behavior': 'smooth', 'block': 'end'});
+        }
+
+        /* print a line by character using settimeout as the queue */
+        function print_string(str_list) {
+            var letters;
+            var pause;
+            for (var i=0; i < str_list.length; i++) {
+                if (str_list[i].substring(0,5) == 'PAUSE') {
+                    pause = str_list[i].split(':')[1];
+                    print_char("", dv.innerHTML, (delay += ((pause*1) + increment)));
+                    continue;
+                }
+                letters = str_list[i].split('');
+                for (var index=0; index < letters.length; index++) {
+                    print_char(letters[index], dv.innerHTML, (delay += jitter(increment)));
+                }
+                setTimeout(reset_div, (delay += increment));
+            }
+        }
+
+        /* called from within settimeout, prints one character */
+        function print_char(chr, content, delay) {
+            setTimeout(function() {
+                dv.innerHTML = dv.innerHTML.split('<')[0] + chr + '<' + dv.innerHTML.split('<')[1];
+            }, delay);
+        }
+
+        /* flash the cursor between transparent and var color */
+        function flash_cursor() {
+            var el = document.getElementById("cursor");
+            if (el) {
+                el.style.color = color;
+            }
+            if (color == 'green') {
+                color = 'transparent';
+            }
+            else {
+                color = 'green';
+            }
+            setTimeout(flash_cursor, 500);
+        }
+
+        /* apply a random small jitter that makes the text rendering seem
+           more like a person is typing
+        */
+        function jitter(secs) {
+            if (!use_jitter) {
+                return secs;
+            }
+            var jit = Math.floor((Math.random()*50)+1);
+            if (Math.random() > .25) {
+                return jit + secs;
+            }
+            else {
+                return secs - jit;
+            }
+        }
+
+        /* render the home page content */
+        function run_home() {
+            document.getElementById("screen").classList.remove('screen_loading');
+            dv.innerHTML += cursor;
+            flash_cursor();
+            print_string([
+                'PAUSE:1000',
+                'Hello visitor\n\n', '',
+                'PAUSE:500',
+                'Welcome to jasonmunro.net\n',
+                'PAUSE:200',
+                'You can use the links below to visit:\n\n',
+                'PAUSE:100', '',
+                'home    - this page\n',
+                'html    - my resume as HTML\n',
+                'pdf     - my resume as a PDF\n',
+                'PAUSE:400',
+                'game    - my resume as a playable retro game\n\n',
+                'PAUSE:200',
+                'Maybe you want one of these other things:\n\n',
+                'PAUSE:500', '', '',
+                'Open Source project    - cypht.org\n',
+                'PAUSE:1000',
+                'Blog                   - unencumberedbyfacts.com\n',
+                'PAUSE:1200',
+                'Github accounts        - github.com/jasonmunro/\n',
+                '                       - github.com/cypht-org/\n',
+                'PAUSE:1100',
+                'E-mail                 - jason at cypht dot org\n\n', '',
+                'PAUSE:900',
+                'END OF LINE.\n', ''
+            ]);
+        }
+
+        /* render the HTML resume content */
+        function run_html() {
+            document.getElementById("screen").classList.remove('screen_loading');
+            dv.innerHTML += cursor;
+            flash_cursor();
+            print_string([
+'1               |                                                     Jason Munro |\n',
+'2               |                                                    785-218-4195 |\n',
+'3               |                                               Lawrence KS 66049 |\n',
+'4  SKILLS       |                                                 jason@cypht.org |\n',
+'5  -------------+-----------------------------------------------------------------|\n',
+'PAUSE:500',
+'6     Languages | Python Javascript PHP Bash C++/C SQL Perl                       |\n',
+'7       Systems | Linux (Debian SUSE Redhat Ubuntu Centos) Unix *BSD Windows      |\n',
+'8     Protocols | HTTP REST SMTP IMAP POP3 AJAX LDAP DNS XACML JMAP MQTT          |\n',
+'9      Software | Apache Nginx WordPress Django node EXTjs Postgresql Mysql Cyrus |\n',
+'10              | Dovecot Postfix Varnish OpenLDAP Qmail OpenSSL Vim jQuery       |\n',
+'11              | Snowflake Mapbox React DRF Elasticsearch Memcache Redis         |\n',
+'12      Testing | Nose Pytest Selenium PHPUnit Buildbot Travis-CI                 |\n',
+'13         Misc | Series 7 and 63 financial certifications, X86 Hardware, PCI and |\n',
+'14              | SOX compliance                                                  |\n',
+'15 CAREER       |                                                                 |\n',
+'16 -------------+-----------------------------------------------------------------|\n',
+'PAUSE:500',
+'17              | Solea Energy                                Jul 2019 - Present  |\n',
+'18              | --------------------------------------------------------------- |\n',
+'PAUSE:100',
+'19     Lead Dev | Full stack design, development, and managment of algorithmic    |\n',
+'20              | energy trading solutions in Python, Bash, PHP and Javascript    |\n',
+'21              | built on Linux. Managing 40+ servers, 2 databases, and 30+      |\n',
+'22              | processes running 24/7 responsible for trade generation, risk   |\n',
+'23              | mitigation, and trade submission                                |\n',
+'24              |                                                                 |\n',
+'25              | Farmoble Inc                                Feb 2016 - Jul 2019 |\n',
+'26              | --------------------------------------------------------------- |\n',
+'PAUSE:100',
+'27    Architect | Worked closely with the web, API, and data teams to solve hard  |\n',
+'28              | ag-tech problems with Postgresql/PostGIS, Python, Django, React,|\n',
+'29              | and Mapbox                                                      |\n',
+'30              |                                                                 |\n',
+'31              | Freelance                                   Aug 2015 - Feb 2016 |\n',
+'32              | --------------------------------------------------------------- |\n',
+'PAUSE:100',
+'33    Developer | Contract development work in Python and PHP for tech start-ups  |\n',
+'34              | in the Kansas City area                                         |\n',
+'35              |                                                                 |\n',
+'36              | Automattic Inc                              May 2013 - Aug 2015 |\n',
+'37              | --------------------------------------------------------------- |\n',
+'PAUSE:100',
+'38    Developer | Worked on all aspects of WordPress.com, Polldaddy, VaultPress,  |\n',
+'39              | Akismet, and central billing and payment processing systems     |\n',
+'40              |                                                                 |\n',
+'41              | BATS Global Markets                         Jun 2008 - May 2013 |\n',
+'42              | --------------------------------------------------------------- |\n',
+'PAUSE:100',
+'43     Web Lead | Worked with a team of 6 developers building complete            |\n',
+'44              | applications from the database to the interface. Wrote tools to |\n',
+'45              | monitor and control 2 US stock exchanges, 1 US Options exchange |\n',
+'46              | and 1 pan-European stock exchange.                              |\n',
+'47              |                                                                 |\n',
+'48   Batch Lead | Ran a developer and DB team responsible for regulatory          |\n',
+'49              | adherence, internal and external reporting, data retention      |\n',
+'50              | requirements, and database management of hundreds of Postgresql |\n',
+'51              | database installations world wide.                              |\n',
+'52              |                                                                 |\n',
+'53      Web Dev | Responsible for creating and maintaining sophisticated web      |\n',
+'54              | applications to control and monitor trading platforms. Primary  |\n',
+'55              | web developer building BATS EU and US Options exchange          |\n',
+'56              |                                                                 |\n',
+'57              | Graybeard Inc                               May 2006 - Jun 2008 |\n',
+'58              | --------------------------------------------------------------- |\n',
+'PAUSE:100',
+'59    CEO/Owner | Founded an S-Class Corporation providing dynamic websites for a |\n',
+'60              | variety of clients. Built a custom PHP framework to produce     |\n',
+'61              | dynamic sites with built in content management.                 |\n',
+'62              |                                                                 |\n',
+'63              | Standard Beverage                           Jan 2000 - May 2006 |\n',
+'64              | --------------------------------------------------------------- |\n',
+'65    Net Admin | Installed and configured Cisco PIX firewalls for DMZ and IPSEC  |\n',
+'66              | VPN, Created Linux based routers for flexible WAN routing       |\n',
+'67    Developer | Replaced aging corporate E-mail with modern web-based solution  |\n',
+'68    Sys Admin | Maintained 20+ Linux servers responsible for corporate E-mail   |\n',
+'69              | DNS, PDC login from Windows, file sharing, and WAN routing      |\n',
+'70              |                                                                 |\n',
+'71 LEISURE      |                                                                 |\n',
+'72 -------------+-----------------------------------------------------------------|\n',
+'PAUSE:500',
+'73        Linux | Linux hobbyist for 20+ years. From firewall appliances to LFS   |\n',
+'74              | systems to custom routers to creating my own rescue distro      |\n',
+'75              |                                                                 |\n',
+'76        Cypht | Author and maintainer of an Open Source webmail application     |\n',
+'77              | written in PHP and Javascript https://cypht.org                 |\n',
+'78              |                                                                 |\n',
+'79         Blog | I write about my technology adventures while attempting to be   |\n',
+'80              | funny at https://unencumberedbyfacts.com                        |\n\n\n',
+        ]);
+    }
+
+        /* render the source for this page */
+        function run_source() {
+            console.log('here');
+        }
+
+        /* render the pyxel game content */
+        function run_game() {
+            const game = document.createElement("iframe");
+            game.src = 'retro.html';
+            game.id = 'gamediv';
+            game.classList.add('screen');
+            document.getElementById('screen').style.display = 'None';
+            document.getElementById('outer').insertBefore(game, document.getElementById('logo'));
+        }
+
+        /* callback for the menu links that controls what view to load */
+        function switch_page(el) {
+
+            /* get the onclick element text */
+            var page = el.innerHTML;
+
+            /* if the gamediv is present delete it */
+            var game = document.getElementById('gamediv');
+            if (game) {
+                game.remove()
+            }
+
+            /* show the screen */
+            document.getElementById('screen').style.display = 'block';
+
+            /* if we have any text queued up to print, cancel it */
+            var id = window.setTimeout(function() {}, 0);
+            while (id--) {
+                window.clearTimeout(id);
+            }
+
+            /* empty out the 2 text containers in the TV screen */
+            dv.innerHTML = '';
+            oldlines.innerHTML = '';
+
+            /* prep and fire off the home page */
+            if (page == 'home') {
+                use_jitter = true;
+                delay = 700;
+                increment = 70;
+                document.getElementById('screen').classList.add('screen_loading');
+                document.getElementById('screen').classList.add('screen_home_mobile');
+                document.getElementById('screen').classList.add('screen_home');
+                document.getElementById('screen').classList.remove('screen_html_mobile');
+                document.getElementById('screen').classList.remove('screen_html');
+                setTimeout(run_home, 1500);
+            }
+
+            /* prep and fire off the HTML resume page */
+            if (page == 'html') {
+                use_jitter = false;
+                delay = 5;
+                increment = 1;
+                document.getElementById('screen').classList.add('screen_loading');
+                document.getElementById('screen').classList.add('screen_html_mobile');
+                document.getElementById('screen').classList.add('screen_html');
+                document.getElementById('screen').classList.remove('screen_home_mobile');
+                document.getElementById('screen').classList.remove('screen_home');
+                setTimeout(run_html, 1500);
+            }
+
+            /* redirect the browser to the resume PDF file */
+            if (page == 'pdf') {
+                document.location = './Jason_Munro.pdf';
+            }
+
+            /* fire off the game page */
+            if (page == 'game') {
+                document.getElementById('screen').classList.add('screen_loading');
+                setTimeout(run_game, 1500);
+            }
+
+            /* source code for this page foramtted via github */
+            if (page == 'src') {
+                document.getElementById('screen').classList.add('screen_loading');
+                setTimeout(run_source, 1500);
+            }
+            return false;
+        }
+
+        /* load the home page on first load. trigger the loading static on the TV
+           screen */
+        window.addEventListener("load", function(event) {
+            document.getElementById('screen').classList.add('screen_loading');
+            document.getElementById('screen').classList.add('screen_home_mobile');
+            setTimeout(run_home, 1500);
+        });
+    </script>
+    </body>
+</html>
