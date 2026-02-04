@@ -135,17 +135,15 @@
                 left: 0px;
                 right: 0px;
                 height: 10px;
-                background: linear-gradient(to top, #000, #111, #333, #111, #000);
-                opacity: .4;
+                background: linear-gradient(to top, #000, #111, #222, #111, #000);
                 z-index: 3;
-                animation-name: vmove;
-                animation-duration: .3s;
-                animation-timing-function: linear;
+                animation: vmove 10s infinite forwards;
                 opacity: 0;
             }
             @keyframes vmove {
-                0% { opacity: .2; transform: translate(0,0) }
-                50% { opacity: .5 }
+                0% { opacity: .0; }
+                90% { opacity: .0; transform: translate(0, 0px) }
+                91% { opacity: .2; }
                 100% { opacity: .2; transform: translate(0, 620px) }
             }
 
@@ -216,6 +214,25 @@
             .menu a:hover {
                 color: #999;
                 text-shadow: 0px 2px 3px rgba(160,160,160,0.5);
+            }
+
+            /* flashing light on TV */
+            .flasher {
+                width: 15px;
+                height: 15px;
+                background-color: green;
+                border-radius: 50%;
+                position: absolute;
+                bottom: 108px;
+                right: calc(50% - 444px);
+                opacity: .5;
+                translateX(calc(50% - 444px));
+                animation: flash 20s infinite alternate;
+            }
+            @keyframes flash {
+                0% { background-color: transparent; }
+                99% { background-color: transparent; }
+                100% { background-color: #71db22; }
             }
 
             /* anything smaller than 1350x900 is treated as mobile (for now).
@@ -301,7 +318,7 @@
 
             <!-- TV screen and logo -->
             <div class="screen screen_home" id="screen">
-                <div id="vhold"></div>
+                <div class="vhold"></div>
                 <pre id="oldlines"></pre>
                 <pre id="newlines"></pre>
             </div>
@@ -312,6 +329,7 @@
                  that covers that div but does not capture input
             -->
             <div inert class="crt">
+            <div class="flasher"></div>
             </div>
         </div>
 
@@ -545,19 +563,6 @@
             document.getElementById('outer').insertBefore(game, document.getElementById('logo'));
         }
 
-        /* screen vertical hold type effect */
-        function run_vhold() {
-            var vhold = document.getElementById('vhold');
-            if (vhold.classList[0] == 'vhold') {
-                vhold.classList.remove('vhold');
-            }
-            else {
-                vhold.classList.add('vhold');
-            }
-            var delay = Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000;
-            setTimeout(run_vhold, delay);
-        }
-
         /* callback for the menu links that controls what view to load */
         function switch_page(el) {
 
@@ -623,7 +628,6 @@
             document.getElementById('screen').classList.add('screen_loading');
             document.getElementById('screen').classList.add('screen_home_mobile');
             setTimeout(run_home, 1500);
-            setTimeout(run_vhold, 1600);
         });
     </script>
     </body>
