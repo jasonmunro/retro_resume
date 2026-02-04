@@ -503,11 +503,6 @@
         ]);
     }
 
-        /* render the source for this page */
-        function run_source() {
-            console.log('here');
-        }
-
         /* render the pyxel game content */
         function run_game() {
             const game = document.createElement("iframe");
@@ -582,8 +577,7 @@
 
             /* source code for this page foramtted via github */
             if (page == 'src') {
-                document.getElementById('screen').classList.add('screen_loading');
-                setTimeout(run_source, 1500);
+                document.location = 'https://github.com/jasonmunro/retro_resume/blob/main/site.html';
             }
             return false;
         }
