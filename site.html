@@ -7,7 +7,7 @@
     I built this by hand with as few dependencies as possible. Everything
     except the images and the pyxel game code is inline with comments. It's a
     very simple system with a full screen flexbox layout. It's all vanilla JS
-    outside of the game specific bits.
+    outside of the game specific bits which is regulated to an iframe.
 
     The CRT TV is anchored on center bottom of the viewport. It scales well
     both in viewport size and zoom level, but the full site is restricted to
@@ -113,7 +113,7 @@
                 font-size: 12pt;
             }
             
-            /* found this online (citation). It's a cool CSS way to do
+            /* found this online [citation needed]. It's a cool CSS way to do
                a static intro on the TV screen
             */
             .screen_loading {
@@ -253,14 +253,11 @@
         </style>
     </head>
     <body>
-        <!-- content containers -->
+        <!-- content container -->
         <div class="outer" id="outer">
 
             <!-- menu and links -->
             <div class="menu">
-                <!-- sometimes a couple inline onclick events make sense. This
-                    is one of those
-                -->
                 <a onclick="switch_page(this);" title="Home">home</a>
                 <a onclick="switch_page(this);" title="Resume as HTML">html</a>
                 <a onclick="switch_page(this);" title="Resume as PDF">pdf</a>
@@ -276,7 +273,8 @@
             <div class="logo">jasonmunro.net</div>
 
             <!-- TV frame. Note the "inert" attribute. This allows passthrough
-                JS events so this div can mask the "screen"
+                 JS events so this div can have a transparent area for the screen
+                 that covers that div but does not capture input
             -->
             <div inert class="crt">
             </div>
@@ -290,7 +288,6 @@
            and increment control how fast the print operation works, and color is for
            the flashing cursor
          */
-
         var use_jitter = true;
         var delay = 700;
         var increment = 70;
