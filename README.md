@@ -1,4 +1,12 @@
 # Retro Resume
+
+## Two main files:
+
+### site.html
+
+source of https://jasonmunro/, my personal website
+
+### main.py
 Retro game written in pyxel that provides info from my resume
 
 This was a weekend project to learn aobut writing games in Python
