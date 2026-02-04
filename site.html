@@ -271,7 +271,7 @@
                 <a onclick="switch_page(this);" title="Resume as a game">game</a>
                 <b>|</b>
                 <a onclick="window.open('./Jason_Munro.pdf', '_blank');" title="Resume as PDF">pdf</a>
-                <a onclick="window.open('https://github.com/jasonmunro/retro_resume/blob/main/site.html', '_blank');" title="Page source">src</a>
+                <a onclick="window.open('https://github.com/jasonmunro/retro_resume/', '_blank');" title="Website and game code source">src</a>
                 <a onclick="window.open('https://cypht.org/', '_blank');" title="OS project">os</a>
                 <a onclick="window.open('https://unencumberedbyfacts.com', '_blank');" title="Blog">blog</a>
                 <a onclick="window.open('https://github.com/cypht-org/', '_blank');" title="Github">git</a>
@@ -398,7 +398,7 @@
                 'game    ● my resume as a playable retro game\n',
                 'PAUSE:400',
                 'pdf     ↗ my resume as a PDF\n',
-                'src     ↗ the source for this website on github\n',
+                'src     ↗ website and retro game source on github\n',
                 'PAUSE:500', '', '',
                 'os      ↗ cypht home page\n',
                 'blog    ↗ unencumbered by facts\n',
@@ -570,35 +570,11 @@
                 setTimeout(run_html, 1500);
             }
 
-            /* redirect the browser to the resume PDF file */
-            if (page == 'pdf') {
-                document.location = './Jason_Munro.pdf';
-            }
-
             /* fire off the game page */
             if (page == 'game') {
                 document.getElementById('screen').classList.add('screen_loading');
                 setTimeout(run_game, 1500);
             }
-
-            /* source code for this page foramtted via github */
-            if (page == 'src') {
-                document.location = 'https://github.com/jasonmunro/retro_resume/blob/main/site.html';
-            }
-
-            /* cypht home page */
-            if (page == 'os') {
-                document.location = 'https://cypht.org';
-            }
-            /* blog */
-            if (page == 'blog') {
-                document.location = 'https://unencumberedbyfacts.com';
-            }
-            /* cypht github */
-            if (page == 'git') {
-                document.location = 'https://github.com/cypht-org/';
-            }
-            /* email mailto? */
             return false;
         }
 
